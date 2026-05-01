@@ -84,9 +84,9 @@ def organize_imports(sn, searchWiseRep = False):
     """
 
     print('Organizing files...\n')
-    
+
     #### UNPACK WISeREP DOWNLOAD ################
-    
+
     #check if WiseRep Download occured
     if searchWiseRep:
 
@@ -159,5 +159,7 @@ def organize_imports(sn, searchWiseRep = False):
                     if os.path.exists(file_path):
                         print(f'   removing: {n}{exts[i]}\n')
                         os.remove(file_path)
-
+                        
+    print("Files sorted. \n")
+    
     return None
