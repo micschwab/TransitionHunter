@@ -11,7 +11,6 @@ Create a virtual environment and install all requirements
 conda create --name transitionHunter python pip jupyter
 conda activate transitionHunter
 pip install -r requirements.txt
-
 ```
 Install SNID-SAGE 
 ```
@@ -20,4 +19,9 @@ pip install snid-sage
 Install WISeREP_API
 ```
 pip install snid-sage
+```
+# Setup
+Clone the repository
+```
+git clone 
 ```
