@@ -87,8 +87,8 @@ def run_TransitionHunter(sn, searchWiseRep=False, showPlots=True, z=None):
     
     ################### GENERATE PLOTS  #####################
     # Plot Confident Class IDs if a transition has occured
-    if has_transitioned == True:
-        plotResults.make_plots(legit_classes, showPlots)
+    # if has_transitioned == True:
+    #     plotResults.make_plots(legit_classes, showPlots)
 
     ########################################################
     #Close log (very end of script)

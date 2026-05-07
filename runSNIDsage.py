@@ -200,7 +200,7 @@ def sort_spectra(filepath):
     batch_results = pd.read_csv(filepath + "batch_results.csv")
     
     # get filenames for the spectra
-    filenames = np.array(filenames = np.array(batch_results["file"])
+    filenames = np.array(filenames = np.array(batch_results["file"]))
                          
     # get observation dates from filenames and add a corresponding column to the dataframe
     date = get_obs_date(filenames)

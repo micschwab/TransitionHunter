@@ -14,7 +14,4 @@ This Module will perform basic plotting and style for diagnositc plots
 
 # From SNID results/tranistionlog.csv
 
-#idea: Id-type vs epoch to show changes in trends 
-# --> plot reported epochs' SN IDs, along with their best-fitting SN spectral template
-# --> Plot of the SN’s spectral evolution, distinguished by SNID–SAGE classification in both color and marker
-
+#
