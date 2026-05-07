@@ -6,22 +6,38 @@ analyzes the output to determine whether or not a transition in spectral identif
 
 ## Installation
 #### Virtual Environment (Recommended)
-Create a virtual environment and install all requirements
+Create a virtual environment 
 ```
 conda create --name transitionHunter python pip jupyter
 conda activate transitionHunter
+```
+#### Install all Requirements
+```
 pip install -r requirements.txt
 ```
-Install SNID-SAGE 
+Install SNID-SAGE & WISeREP_API
 ```
 pip install snid-sage
-```
-Install WISeREP_API
-```
-pip install snid-sage
+pip install wiserep_api
 ```
 # Setup
-Clone the repository
+### Clone the repository 
+Clone the GitHub repository 
 ```
-git clone 
+git clone git@github.com:micschwab/TransitionHunter.git
 ```
+### Providing Spectra 
+If you want to analyze spectra already downloaded onto your local machine, copy all files into a /spectra folder within the main directory
+```
+cd TransitionHunter/
+mkdir spectra
+cd spectra
+cp -p ~/path_to_desried_files/* .
+```
+If you choose to download spectra by querying WISeREP, downloaded files will be added to this folder. 
+If you choose not to provide any spectra and instead only query WISeREP, this folder will be created for you.
+
+### Supported Data Formats
+
+- FITS files (.fits, .fit)
+- ASCII tables (.dat, .txt, .ascii, .asci, .csv, .flm)
