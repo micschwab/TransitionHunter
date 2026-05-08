@@ -1,11 +1,14 @@
 import glob
 import warnings
 import sys
+import re
 import os
 import json
+import pandas as pd
 import subprocess
 import warnings
 from astropy.io import fits
+from astropy.time import Time
 import matplotlib.pyplot as plt
 import numpy as np
 from specutils import Spectrum1D
@@ -178,10 +181,10 @@ def analyze_output(filepath):
     """
     
     # Compile relavant SNID-SAGE spectral data sorted by date of observation 
-    result_df = runSNIDsage.sort_spectra("snid_results/")
+    result_df = sort_spectra("snid_results/")
 
     # Report how many spectra SNID-SAGE successfully analyzed 
-    success_df = runSNIDsage.check_sucess(result_df)
+    success_df = check_success(result_df)
     
     return success_df
     
@@ -200,7 +203,7 @@ def sort_spectra(filepath):
     batch_results = pd.read_csv(filepath + "batch_results.csv")
     
     # get filenames for the spectra
-    filenames = np.array(filenames = np.array(batch_results["file"]))
+    filenames = np.array(batch_results["file"])
                          
     # get observation dates from filenames and add a corresponding column to the dataframe
     date = get_obs_date(filenames)

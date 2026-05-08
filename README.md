@@ -41,3 +41,11 @@ If you choose not to provide any spectra and instead only query WISeREP, this fo
 
 - FITS files (.fits, .fit)
 - ASCII tables (.dat, .txt, .ascii, .asci, .csv, .flm)
+
+### Clean Up/Running Multiple Times
+If you have already completed one analysis, you must rename the following folders /raw, /spectra, and /snid_results,
+in the working directory. We recommend moving them into a folder with the same name as the SN.
+```
+mkdir SN_name
+mv raw/ spectra/ snid_results/ SN_name/
+```

@@ -1,7 +1,7 @@
 import os
 import re
 import glob
-import tabulate
+from tabulate import tabulate
 import numpy as np
 import pandas as pd
 import json
@@ -197,26 +197,41 @@ def get_transition_report(confident_df):
     # 2. Get Max Streak
     t_persistence = {t: max(streaks) for t, streaks in type_streaks.items()}
     s_persistence = {s: max(streaks) for s, streaks in subtype_streaks.items()}
+
+    #3. Get Ambiguity Statistics
+    type_ambig_counts = confident_df.index.isin(type_ambig_indx)
+    type_ambig_pct = (pd.Series(type_ambig_counts, index=confident_df['type'])
+                  .groupby(level=0)
+                  .mean() * 100).to_dict()
+    subtype_ambig_counts = confident_df.index.isin(subtype_ambig_indx)
+    subtype_ambig_pct = (pd.Series(subtype_ambig_counts, index=confident_df['subtype'])
+                  .groupby(level=0)
+                  .mean() * 100).to_dict()
     
     # Modify the Transition DataFrame with these stats
     report_df = transition_df.copy()
     
-    report_df['type_max_streak'] = report_df['type'].map(t_persistence)
-    report_df['subtype_max_streak'] = report_df['subtype'].map(s_persistence)
-    report_df['type_freq'] = report_df['type'].map(t_freq)
-    report_df['subtype_freq'] = report_df['subtype'].map(s_freq)
-    report_df['type_ambig'] = report_df.index.isin(type_ambig_indx)
-    report_df['subtype_ambig'] = report_df.index.isin(subtype_ambig_indx)
+    report_df["type_max_streak"] = report_df["type"].map(t_persistence)
+    report_df["subtype_max_streak"] = report_df["subtype"].map(s_persistence)
+    report_df["type_freq"] = report_df["type"].map(t_freq)
+    report_df["subtype_freq"] = report_df["subtype"].map(s_freq)
 
+    # Flag ambiguity by spectrum but also note if the type is ambiguous 
+    # avoids throwing out a real classification by one low confidence instance
+    report_df["local_type_ambig"] = report_df.index.isin(type_ambig_indx)
+    report_df["local_subtype_ambig"] = report_df.index.isin(subtype_ambig_indx)
+
+    report_df["type_ambig_pct"] = report_df["type"].map(type_ambig_pct)
+    report_df["subtype_ambig_pct"] = report_df["subtype"].map(subtype_ambig_pct)
 
     #################### PRINT RESULTS ########################
 
     # Report novel Classifications
-    print(f"{len(report_df)} Novel Identifications Found...\n")
+    print(f"{len(report_df)} Novel Identifications Found. Shown here by date of first identification:\n")
     report_df['date'] = pd.to_datetime(report_df['date']).dt.strftime('%Y-%m-%d')
     print_report_data = report_df[["date", "type", "subtype", "match_quality", "best_template", "type_confidence",
-                                   "second_best_type","subtype_confidence", "second_best_subtype", "type_ambig", 
-                                   "subtype_ambig"]].values.tolist()
+                                   "second_best_type","subtype_confidence", "second_best_subtype", "local_type_ambig", 
+                                   "local_subtype_ambig"]].values.tolist()
     report_headers = ["date", "type", "subtype", "match_quality", "best_template", "type_confidence",
                       "second_best_type","subtype_confidence", "second_best_subtype", "type_ambiguous", "subtype_ambiguous"]
 
@@ -231,7 +246,7 @@ def get_transition_report(confident_df):
     else:
         print("No Ambigous Classifications")
 
-    print("Identification Statistics:")
+    print("\nIdentification Statistics:")
 
     if len(novel_ID) > 1:
         print("\nMATCHES FOUND FOR THE FOLLOWING SN TYPES:")
@@ -274,19 +289,28 @@ def get_verdict(report_df):
             # This is a TYPE transition
             # Check type metrics
             streak = row["type_max_streak"]
-            ambig = row["type_ambig"]
+            global_ambig = row["type_ambig_pct"]
+            local_ambig = row["local_type_ambig"]
             freq = row["type_freq"]
         
         else:
             # The type is the same as the previous row so this is a SUBTYPE transition
             # Check subtype metrics
             streak = row["subtype_max_streak"]
-            ambig = row["subtype_ambig"]
+            global_ambig = row["subtype_ambig_pct"]
+            local_ambig = row["local_subtype_ambig"]
             freq = row["subtype_freq"]
     
         # Apply conditions for transition
-        # # Streak must be 2+ AND Ambiguity must be False
-        legit = (streak >= 2) & (not ambig)
+        
+        # # If the type is dominant (Freq > 50%) OR often very clear (Global Ambig < 50%),
+        # # ignore the 'local' ambiguity 
+        if (freq > 50.0) or (global_ambig < 50.0):
+            legit = (streak >= 2) 
+        else:
+            # For rare/unreliable types, we stay strict
+            # # Streak must be 2+ AND Ambiguity must be False
+            legit = (streak >= 2) and (not local_ambig)
     
         # Assign values to the report dataframe
         if legit:
@@ -305,7 +329,7 @@ def get_verdict(report_df):
     
     # Save Legitimate Classifications
     legit_classes = verdict_df[verdict_df["verdict"] == "Y"]
-    legit_classes = verdict_df.reset_index(drop=True)
+    legit_classes = legit_classes.reset_index(drop=True)
     
     return legit_classes
 
@@ -321,23 +345,23 @@ def print_results(legit_classes):
     """
     print("\nSUMMARIZING RESULTS... ")
 
-    if len(legit_events) == 0:
+    if len(legit_classes) == 0:
         # No classification passed confidence checks
         print("\nNO TRANSITION FOUND")
         print("No SN ID passed confidence checks.")
         print("This may occur if SNID-SAGE classifications are ambiguous or if there are no consecutive identifications in the SN evolution.")
         
-    elif len(legit_events) == 1:
+    elif len(legit_classes) == 1:
         # No transition occured, only one classification passed confidence checks
         print("\nNO TRANSITION FOUND: 1 confident classification\n")
-        table_data = legit_events[["type","subtype", "confidence"]].values.tolist()
+        table_data = legit_classes[["type","subtype", "confidence"]].values.tolist()
         headers = ["TYPE", "SUBTYPE", "CONFIDENCE"]
         print(tabulate(table_data, headers=headers, tablefmt="simple", stralign="center"))
     
-    elif len(legit_events) > 1:
+    elif len(legit_classes) > 1:
         # transition found! 
-        print(F"TRANSITION FOUND: {len(legit_events)} confident classification\n")
-        table_data = legit_events[["date", "type", "subtype", "confidence"]].values.tolist()
+        print(F"TRANSITION FOUND: {len(legit_classes)} confident classifications\n")
+        table_data = legit_classes[["date", "type", "subtype", "confidence"]].values.tolist()
         headers = ["DATE","TYPE", "SUBTYPE", "CONFIDENCE"]
         print(tabulate(table_data, headers=headers, tablefmt="simple", stralign="center"))
 
