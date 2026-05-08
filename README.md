@@ -42,10 +42,26 @@ If you choose not to provide any spectra and instead only query WISeREP, this fo
 - FITS files (.fits, .fit)
 - ASCII tables (.dat, .txt, .ascii, .asci, .csv, .flm)
 
+### Running TransitionHunter
+From your command line (using python or ipython) or in a jupyter notebook run TransitionHunter in the main directory
+```
+#import 
+from run import run_TranistionHunter
+
+#example usage:
+run_TransitionHunter('SN_name') # example run, SNID-SAGE
+
+run_TransitionHunter('SN_name', z = 0.07) # example run, with redshift if known, may improve SNID-SAGE results by forcing the reshift to the known value 
+
+run_TranistionHunter('SN_name', searchWiserep=True, z =0.07) #query WISeREP & force redshift
+
+```
+
 ### Clean Up/Running Multiple Times
-If you have already completed one analysis, you must rename the following folders /raw, /spectra, and /snid_results,
-in the working directory. We recommend moving them into a folder with the same name as the SN.
+If you have already completed one analysis, you must move or rename the tansition.log file and the following folders: /raw, /spectra, and /snid_results.
+We recommend moving them into a folder with the same name as the SN.
 ```
 mkdir SN_name
 mv raw/ spectra/ snid_results/ SN_name/
+mv transition.log SN_name/
 ```

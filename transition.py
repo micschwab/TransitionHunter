@@ -305,7 +305,7 @@ def get_verdict(report_df):
         
         # # If the type is dominant (Freq > 50%) OR often very clear (Global Ambig < 50%),
         # # ignore the 'local' ambiguity 
-        if (freq > 50.0) or (global_ambig < 50.0):
+        if (freq > 50.0) or (global_ambig < 15.0):
             legit = (streak >= 2) 
         else:
             # For rare/unreliable types, we stay strict

@@ -83,12 +83,12 @@ def organize_imports(sn, searchWiseRep = False):
 
     """
 
-    print('Organizing files...\n')
+    print('\nOrganizing files...\n')
 
     #### UNPACK WISeREP DOWNLOAD ################
 
     #check if WiseRep Download occured
-    if searchWiseRep:
+    if searchWiseRep == True:
 
         # Move WiseReP imports out of object specific subfolder (TransitionmHunter runs on one object at a time)
         ##  ~ could be changed in future iterations to run TransitionHunter on multiple objects at a time ~

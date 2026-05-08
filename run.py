@@ -6,15 +6,13 @@ from io import StringIO
 import spectra
 import runSNIDsage
 import transition
-import plotResults
 
 """
 This module runs TransitionHunter
 
-All output saved to 'transition.log'
+All output is saved to "transition.log"
 
-SNID-SAGE output stored in snid_results/
-Transition Diagnostic plots saved in results/ 
+SNID-SAGE summary and diagnostic plots saved in snid_results/ 
 --------------------------------------------------------------
 Functions:
  - run_TransitionHunter(): wrapper for all tools/logic
@@ -25,7 +23,7 @@ Classes:
 
 class Tee(object):
     """
-    This class will mimic UNix "tee" command and allow
+    This class will mimic Unix "tee" command and allow
     data written to the log to be redirected simultaneusly to standard output.
     
     Methods:
@@ -42,7 +40,7 @@ class Tee(object):
         for f in self.files:
             f.flush()
             
-def run_TransitionHunter(sn, searchWiseRep=False, showPlots=True, z=None):
+def run_TransitionHunter(sn, searchWiseRep=False, z=None):
     """
     This function wraps all operations/analysis of the program
 
@@ -113,12 +111,6 @@ def run_TransitionHunter(sn, searchWiseRep=False, showPlots=True, z=None):
         print("#" * 100)
     
         has_transitioned = transition.hunt(sn, success_df)
-    
-        
-        ################### GENERATE PLOTS  #####################
-        # Plot Confident Class IDs if a transition has occured
-        # if has_transitioned == True:
-        #     plotResults.make_plots(legit_classes, showPlots)
     
     finally:
         ########################################################
