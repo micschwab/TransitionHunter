@@ -57,11 +57,11 @@ def hunt(sn, success_df):
     print_results(legit_classes)
 
     # define a boolean as to weather a transiton was found
-    tranistioned = False
-    
     if len(legit_classes) > 1:
         transitioned = True
-    
+    else:
+        transitioned = False
+        
     return transitioned
     
 def get_transition_report(confident_df):
