@@ -15,11 +15,7 @@ conda activate transitionHunter
 ```
 pip install -r requirements.txt
 ```
-Install SNID-SAGE & WISeREP_API
-```
-pip install snid-sage
-pip install wiserep_api
-```
+
 # Setup
 ### Clone the repository 
 Clone the GitHub repository 
